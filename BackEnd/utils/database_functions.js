@@ -81,6 +81,7 @@ class Database_functions {
     }
   }
 
+
   async getPosition(userId, gameId) {
     try {
       const player = await Player.findOne({
