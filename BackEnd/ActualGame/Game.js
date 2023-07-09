@@ -20,7 +20,9 @@ class Game
 
     joinUser(userId) //not completed
     {
+        //let currentNumberOfPlayers =
         this.playerscounter++;
+        getCurrentNumberOfPlayers()
         if (this.playerscounter == this.numOfPlayers)
         {
             this.timerCheck();

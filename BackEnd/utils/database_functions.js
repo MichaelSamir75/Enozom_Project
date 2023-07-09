@@ -4,117 +4,124 @@ const Player = require('../models/player.module');
 const Board = require('../models/board.module');
 const Elements = require('../models/elements.module');
 
-async function getUsernameById(userId) {
-  try {
-    const user = await User.findByPk(userId);
-    if (!user) {
-      throw new Error(`User not found with ID ${userId}`);
-    }
-    return user.dataValues.Username;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
+class Database_functions {
 
-async function getNumberOfPlayers(RoomId) {
-  try {
-    const game = await Game.findByPk(RoomId);
-    if (!game) {
-      throw new Error(`Game not found with ID ${RoomId}`);
+  async getUsernameById(userId) {
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) {
+        throw new Error(`User not found with ID ${userId}`);
+      }
+      return user.dataValues.Username;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    return game.dataValues.NumberOfPlayers;
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
-}
-async function getCurrentNumberOfPlayers(RoomId) {
-  try {
-    const game = await Game.findByPk(RoomId);
-    if (!game) {
-      throw new Error(`Game not found with ID ${RoomId}`);
+
+  async getNumberOfPlayers(RoomId) {
+    try {
+      const game = await Game.findByPk(RoomId);
+      if (!game) {
+        throw new Error(`Game not found with ID ${RoomId}`);
+      }
+      return game.dataValues.NumberOfPlayers;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    return game.dataValues.CurrentNoPlayers;
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
-}
+
+  async getCurrentNumberOfPlayers(RoomId) {
+    try {
+      const game = await Game.findByPk(RoomId);
+      if (!game) {
+        throw new Error(`Game not found with ID ${RoomId}`);
+      }
+      return game.dataValues.CurrentNoPlayers;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
 // function for register
-async function createUser(username, password) {
-  try {
-    const user = await User.create({
-      Username: username,
-      Password: password
-    });
-    console.log("User created:", user);
-    return user;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw error;
+  async createUser(username, password) {
+    try {
+      const user = await User.create({
+        Username: username,
+        Password: password
+      });
+      console.log("User created:", user);
+      return user;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw error;
+    }
   }
-}
+
 // function for login
-async function checkCredentials(username, password) {
-  try {
-    const user = await User.findOne({ where: { Username: username, Password: password } });
-    return !!user; // Returns true if user exists, false otherwise
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
-
-
-async function getPosition(userId, gameId) {
-  try {
-    const player = await Player.findOne({
-      where: { GameId: gameId, UserId: userId },
-      attributes: ['Position']
-    });
-
-    if (!player) {
-      throw new Error(`Player not found with Game ID ${gameId} and User ID ${userId}`);
+  async checkCredentials(username, password) {
+    try {
+      const user = await User.findOne({where: {Username: username, Password: password}});
+      return !!user; // Returns true if user exists, false otherwise
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-
-    return player.dataValues.Position;
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
-}
-async function setGameStatus(RoomId, State) {
-  try {
-    const updatedRows = await Game.update(
-      { State: State },
-      { where: { RoomId: RoomId } }
-    );
 
-    if (updatedRows[0] === 0) {
-      throw new Error(`Game not found with ID ${gameId}`);
+
+  async getPosition(userId, gameId) {
+    try {
+      const player = await Player.findOne({
+        where: {GameId: gameId, UserId: userId},
+        attributes: ['Position']
+      });
+
+      if (!player) {
+        throw new Error(`Player not found with Game ID ${gameId} and User ID ${userId}`);
+      }
+
+      return player.dataValues.Position;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
+  }
 
-    return State;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-async function getGameStatus(gameId) {
-  try {
-    const game = await Game.findByPk(gameId);
-    if (!game) {
-      throw new Error(`Game not found with ID ${gameId}`);
+  async setGameStatus(RoomId, State) {
+    try {
+      const updatedRows = await Game.update(
+          {State: State},
+          {where: {RoomId: RoomId}}
+      );
+
+      if (updatedRows[0] === 0) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+
+      return State;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    console.log(game)
-    return game.dataValues.State;
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
-}
+
+  async getGameStatus(gameId) {
+    try {
+      const game = await Game.findByPk(gameId);
+      if (!game) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+      console.log(game)
+      return game.dataValues.State;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
 // Example usage
 // const username = "JohnDoe";
 // const password = "secret";
@@ -122,8 +129,10 @@ async function getGameStatus(gameId) {
 //createUser(username, password);
 
 // Example usage
-const userId = 1;
-const gameId = 2;
+  const
+  userId = 1;
+  const
+  gameId = 2;
 
 // getPosition(userId, gameId)
 //   .then(position => {
@@ -159,8 +168,6 @@ const gameId = 2;
 // })();
 
 
-
-
 // checkCredentials(username, password)
 //   .then(result => {
 //     console.log(result); // true or false
@@ -168,3 +175,11 @@ const gameId = 2;
 //   .catch(error => {
 //     console.error(error);
 //   });
+
+}
+
+
+
+const database_functions = new Database_functions();
+
+export default database_functions;
