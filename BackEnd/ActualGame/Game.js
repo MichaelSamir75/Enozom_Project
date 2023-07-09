@@ -8,22 +8,14 @@ class Game
 
     constructor(numOfPlayers, boardnumber, gameId)
     {
+        ///////////////////////// insert game in database with its game id
         this.gameId = gameId;
         // function to get board from database(snakes and stairs)
         this.playerscounter = 1;
-        this.board = new Board(); ////////////   initialize board frmo databaase
-        const currentnumofPlayers = 5; ////////////////// db
-        if (currentnumofPlayers == 1)
-        {
-            //////////// change gamestatus to pending
-            /////////// change lastmore time to current date in db
-        }
-        else
-        {
-            const gamestatus = 5; ////////////////// get from db
-            if (gamestatus == GameStatus.running)
-                this.timerCheck();
-        }
+        this.board = new Board(boardnumber); ////////////   initialize board frmo databaase
+
+        //////////// change gamestatus to pending
+        /////////// change lastmove time to current date in db
     }
 
     joinUser(userId) //not completed

@@ -2,8 +2,14 @@ const Move = require('./Move')
 
 class Board
 {
-    boardId
+    boardnumber
     transitions
+
+    constructor(boardnumber)
+    {
+        this.boardnumber = boardnumber;
+        ////////////////////////////////// initialize transitions from database
+    }
 
     getMoveAfterThrowingDice(dicevalue, position)
     {
