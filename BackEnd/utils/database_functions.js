@@ -252,6 +252,23 @@ class Database_functions {
       throw error;
     }
   }
+  async getElementsByBoardId(BoardId) {
+    try {
+      const elements = await Elements.findAll({
+        where: { BoardId: BoardId },
+        attributes: ['From', 'To']
+      });
+
+      return elements.map(element => ({
+        From: element.dataValues.From,
+        To: element.dataValues.To
+      }));
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
 }
 
 
@@ -264,9 +281,9 @@ const userId = 1;
 const gameId = 1;
 
 
-dbFunctions.setLastMove(gameId, "1970-01-01 00:55:01")
-  .then(position => {
-    console.log(position);
+dbFunctions.getElementsByBoardId(1)
+  .then(elements => {
+    console.log(elements);
   })
   .catch(error => {
     console.error(error);
