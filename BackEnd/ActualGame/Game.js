@@ -1,12 +1,13 @@
 const User = require('./User')
 const Board = require('./Board')
+const db = require('../utils/database_functions')
 
 class Game
 {
     board
     gameId
 
-    constructor(numOfPlayers, boardnumber, gameId)
+    constructor(gameId, numOfPlayers, boardnumber)
     {
         ///////////////////////// insert game in database with its game id
         this.gameId = gameId;
@@ -14,19 +15,21 @@ class Game
         this.playerscounter = 1;
         this.board = new Board(boardnumber); ////////////   initialize board frmo databaase
 
-        //////////// change gamestatus to pending
+        db.setGameStatus(this.gameId, GameStatus.waitingForPlayers);
         /////////// change lastmove time to current date in db
     }
 
-    joinUser(userId) //not completed
+    joinUser(userId)
     {
-        //let currentNumberOfPlayers =
-        this.playerscounter++;
-        getCurrentNumberOfPlayers()
-        if (this.playerscounter == this.numOfPlayers)
+        let currentNumberOfPlayers = db.getCurrentNumberOfPlayers(this.gameId);
+        currentNumberOfPlayers++;
+        db.setCurrentNumberOfPlayers(currentNumberOfPlayers);
+        const numOfPlayers = db.getNumberOfPlayers(this.gameId);
+
+        if (numOfPlayers == currentNumberOfPlayers)
         {
+            db.setGameStatus(this.gameId, GameStatus.running);
             this.timerCheck();
-            ///////////////////////// set gamestatus to running in database
         }
     }
 
@@ -36,12 +39,11 @@ class Game
         const lastmovetime = 5;//////////////////// get from database;
         if (date - lastmovetime >= 20)
         {
-            // get currentplayer id from datbase
-            const id = 5;
+            const id = db.getUserIdFromGameId(this.gameId, turn);
             this.throwDice(id);
         }
 
-        const gamestatus = 5;  ////////// get from database
+        const gamestatus = db.getGameStatus(this.gameId);
         if (gamestatus == GameStatus.finished) return;
         setTimeout(this.timerCheck, 1000);
     }
@@ -50,20 +52,22 @@ class Game
     {
         const dicevalue = Math.random() % 6 + 1;
         // function here to get user position from datbase using userid
-        let position = 5;///////////////////////////////////////////////////////////
+        const position = db.getUserPositionByGameId(this.gameId);
         let move = this.board.getMoveAfterThrowingDice(dicevalue, position);
         this.changeTurn();
-        //////////////////// initialize last move in datbase to move.date
+        //////////////////// initialize last move date in datbase to move.date
+
         if (move.to >= 100)
-        {
-            ///////////////// change gamestatus to finished in database
-        }
+            db.setGameStatus(this.gameId, GameStatus.finished);
         return dicevalue;
     }
 
     changeTurn()//not completed
     {
-        this.currentPlayerIndes = (this.currentPlayerIndes + 1) % this.numOfPlayers;
+        let turn = db.getTurnByGameId(this.gameId);
+        const numOfPlayers = db.getNumberOfPlayers(this.gameId);
+        turn = (turn + 1) % numOfPlayers;
+        db.setTurn(this.gameId, turn);
     }
 }
 
