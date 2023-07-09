@@ -70,6 +70,16 @@ class Database_functions {
       throw error;
     }
   }
+  
+  async checkUsernameUnique(username) {
+    try {
+      const user = await User.findOne({ where: { Username: username } });
+      return !!user; // Returns true if username exists, false otherwise
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
 
   async getPosition(userId, gameId) {
@@ -84,6 +94,37 @@ class Database_functions {
       }
 
       return player.dataValues.Position;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async setGameTurn(RoomId, Turn) {
+    try {
+      const updatedRows = await Game.update(
+          {Turn: Turn},
+          {where: {RoomId: RoomId}}
+      );
+
+      if (updatedRows[0] === 0) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+
+      return Turn;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  async getGameTurn(gameId) {
+    try {
+      const game = await Game.findByPk(gameId);
+      if (!game) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+      console.log(game)
+      return game.dataValues.Turn;
     } catch (error) {
       console.error(error);
       throw error;
@@ -122,64 +163,114 @@ class Database_functions {
     }
   }
 
-// Example usage
-// const username = "JohnDoe";
-// const password = "secret";
+  async getUserIdByGameIdAndTurnOrder(GameId, turnOrder) {
+    try {
+      const player = await Player.findOne({
+        where: { GameId: GameId, TurnOrder: turnOrder },
+        attributes: ['UserId']
+      });
 
-//createUser(username, password);
+      if (!player) {
+        throw new Error(`Player not found with Game ID ${GameId} and Turn Order ${turnOrder}`);
+      }
 
-// Example usage
-  const
-  userId = 1;
-  const
-  gameId = 2;
+      return player.dataValues.UserId;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
-// getPosition(userId, gameId)
-//   .then(position => {
-//     console.log(position);
-//   })
+  async getPositionByTurnOrderAndGameId(turnOrder, gameId) {
+    try {
+      const player = await Player.findOne({
+        where: { TurnOrder: turnOrder, GameId: gameId },
+        attributes: ['Position']
+      });
 
-//setGameStatus(2, 'comted')
-  // .then(game => {
-  //   console.log("Game status set:", game.dataValues.State);
-  // })
-  // .catch(error => {
-  //   console.error(error);
-  // });
+      if (!player) {
+        throw new Error(`Player not found with Turn Order ${turnOrder} and Game ID ${gameId}`);
+      }
 
-// getGameStatus(gameId)
-//   .then(status => {
-//     console.log("Game status:", status);
-//   })
-//   .catch(error => {
-//     console.error(error);
-//   });
+      return player.dataValues.Position;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
-// (async () => {
-//   try {
-//     const username = await getUsernameById(userId);
-//     console.log(username);
+  async getUserIdByGameId(gameId) {
+    try {
+      const turn = await this.getGameTurn(gameId);
+      const userId = await this.getUserIdByGameIdAndTurnOrder(gameId, turn);
+      return userId;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
-//     const numberOfPlayers = await getCurrentNumberOfPlayers(gameId);
-//     console.log(numberOfPlayers);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// })();
+  async getUserPositionByGameId(gameId) {
+    try {
+      const turn = await this.getGameTurn(gameId);
+      const position = await this.getPositionByTurnOrderAndGameId(gameId, turn);
+      return position;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
+  async setLastMove(gameId, lastMove) {
+    try {
+      const game = await Game.findByPk(gameId);
 
-// checkCredentials(username, password)
-//   .then(result => {
-//     console.log(result); // true or false
-//   })
-//   .catch(error => {
-//     console.error(error);
-//   });
+      if (!game) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
 
+      game.LastMove = lastMove;
+      await game.save();
+
+      return lastMove;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async getLastMove(RoomId) {
+    try {
+      const game = await Game.findByPk(RoomId);
+
+      if (!game) {
+        throw new Error(`Game not found with ID ${RoomId}`);
+      }
+      return game.dataValues.LastMove;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 
 
-const database_functions = new Database_functions();
 
-export default database_functions;
+const dbFunctions = new Database_functions();
+
+// Example usage
+const userId = 1;
+const gameId = 1;
+
+
+dbFunctions.setLastMove(gameId, "1970-01-01 00:55:01")
+  .then(position => {
+    console.log(position);
+  })
+  .catch(error => {
+    console.error(error);
+  });
+
+  module.exports = Database_functions;
+  

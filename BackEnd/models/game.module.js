@@ -30,12 +30,9 @@ const User = require('./user.module');
       key: 'BoardId',
     },
   },
-  CurrentUserId: {
+  Turn: {
     type: DataTypes.INTEGER,
-    references: {
-      model: User,
-      key: 'UserId',
-    },
+    allowNull: false,
   },
   CurrentNoPlayers:{
     type: DataTypes.INTEGER,

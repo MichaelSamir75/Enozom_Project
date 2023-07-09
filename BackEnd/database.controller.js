@@ -1,6 +1,6 @@
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(
- 'sequalizeDB',
+ 'sequalizedb',
  'root',
   'Michael82468246',
   {
