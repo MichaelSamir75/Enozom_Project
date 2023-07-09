@@ -37,8 +37,8 @@ sequelize.sync().then(() => {
     console.log('Book table created successfully!');
  
     User.create({
-        Username: "Robert Cecil Martin",
-        Password: "1234",
+        Username: "Martin",
+        Password: "151301234",
     }).then(res => {
         console.log(res)
     }).catch((error) => {

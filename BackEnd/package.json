@@ -1,5 +1,5 @@
 {
-  "name": "tgrba",
+  "name": "Enozom_Project",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,5 +13,8 @@
     "express": "^4.18.2",
     "mysql2": "^3.5.0",
     "sequelize": "^6.32.1"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.1"
   }
 }
