@@ -301,7 +301,24 @@ class Database_functions {
       throw error;
     }
   }
-
+  async addPlayerandSetPlayerTurn(GameId, UserId) {
+    try {
+      const currentNoPlayers = await this.getCurrentNumberOfPlayers(GameId);
+  
+      const player = await Player.create({
+        GameId: GameId,
+        UserId: UserId,
+        Position: 0,
+        TurnOrder: currentNoPlayers+1
+      });
+  
+      console.log("Player created:", player);
+    } catch (error) {
+      console.error("Error creating player:", error);
+      throw error;
+    }
+  }
+  
 
 }
 
@@ -323,16 +340,27 @@ const dbFunctions = new Database_functions();
 //     console.error(error);
 //   });
 
+const GameId = 1;
+const UserId = 2;
 
-  const roomId = 1;
-
-dbFunctions.getBoardIdByRoomId(roomId)
-  .then(boardId => {
-    console.log('BoardId:', boardId);
+dbFunctions.addPlayerandSetPlayerTurn(GameId, UserId)
+  .then(() => {
+    console.log('Player created and turn set successfully.');
   })
   .catch(error => {
     console.error(error);
   });
+
+
+//   const roomId = 1;
+
+// dbFunctions.getBoardIdByRoomId(roomId)
+//   .then(boardId => {
+//     console.log('BoardId:', boardId);
+//   })
+//   .catch(error => {
+//     console.error(error);
+//   });
 
   module.exports = Database_functions;
   
