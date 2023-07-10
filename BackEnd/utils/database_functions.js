@@ -269,6 +269,40 @@ class Database_functions {
     }
   }
 
+  async createGame(NumberOfPlayers,BoardId) {
+    try {
+      const game = await Game.create({
+        NumberOfPlayers: NumberOfPlayers,
+        BoardId: BoardId,
+        State: "Pending",
+        CurrentNoPlayers:0,
+        LastMove:new Date(),
+        Turn : 1
+      });
+      console.log("Game created:", game);
+      return game.dataValues.RoomId;
+    } catch (error) {
+      console.error("Error creating game:", error);
+      throw error;
+    }
+  }
+
+  async getBoardIdByRoomId(RoomId) {
+    try {
+      const game = await Game.findByPk(RoomId);
+
+      if (!game) {
+        throw new Error(`Game not found with Room ID ${RoomId}`);
+      }
+
+      return game.dataValues.BoardId;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+
 }
 
 
@@ -277,13 +311,24 @@ class Database_functions {
 const dbFunctions = new Database_functions();
 
 // Example usage
-const userId = 1;
-const gameId = 1;
+// const userId = 1;
+// const gameId = 1;
 
 
-dbFunctions.getElementsByBoardId(1)
-  .then(elements => {
-    console.log(elements);
+// dbFunctions.getElementsByBoardId(1)
+//   .then(elements => {
+//     console.log(elements);
+//   })
+//   .catch(error => {
+//     console.error(error);
+//   });
+
+
+  const roomId = 1;
+
+dbFunctions.getBoardIdByRoomId(roomId)
+  .then(boardId => {
+    console.log('BoardId:', boardId);
   })
   .catch(error => {
     console.error(error);
