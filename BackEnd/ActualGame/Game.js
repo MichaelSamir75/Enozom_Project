@@ -88,3 +88,5 @@ const GameStatus = {
     waitingForPlayers: "pending",
     finished: "finished"
 }
+
+module.exports = Game;

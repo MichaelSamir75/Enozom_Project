@@ -27,4 +27,4 @@ class Board
     }
 }
 
-export default Board;
+module.exports = Board;

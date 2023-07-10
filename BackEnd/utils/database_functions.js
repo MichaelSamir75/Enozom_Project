@@ -343,13 +343,13 @@ const dbFunctions = new Database_functions();
 const GameId = 1;
 const UserId = 2;
 
-dbFunctions.addPlayerandSetPlayerTurn(GameId, UserId)
-  .then(() => {
-    console.log('Player created and turn set successfully.');
-  })
-  .catch(error => {
-    console.error(error);
-  });
+// dbFunctions.addPlayerandSetPlayerTurn(GameId, UserId)
+//   .then(() => {
+//     console.log('Player created and turn set successfully.');
+//   })
+//   .catch(error => {
+//     console.error(error);
+//   });
 
 
 //   const roomId = 1;
@@ -362,5 +362,6 @@ dbFunctions.addPlayerandSetPlayerTurn(GameId, UserId)
 //     console.error(error);
 //   });
 
-  module.exports = Database_functions;
+const database_functions = new Database_functions();
+module.exports = database_functions;
   
