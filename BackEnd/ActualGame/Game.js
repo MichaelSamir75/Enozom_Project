@@ -11,14 +11,14 @@ class Game
     {
         const id = db.createGame(gameid, numOfPlayers, boardnumber);
         this.gameId = id;
-        this.board = new Board(boardnumber); ////////////   initialize board frmo databaase
+        this.board = new Board(boardnumber);
     }
 
     initExistingGameObject(id)
     {
         this.gameId = gameId;
         const boardnumber = db.getBoardNumber(this.gameId);
-        this.board = new Board(boardnumber); ////////////   initialize board frmo databaase
+        this.board = new Board(boardnumber);
         const status = db.getGameStatus(this.gameId);
 
         if (status == GameStatus.running)
@@ -31,6 +31,7 @@ class Game
         currentNumberOfPlayers++;
         db.setCurrentNumberOfPlayers(this.gameId, currentNumberOfPlayers);
         const numOfPlayers = db.getNumberOfPlayers(this.gameId);
+        db.addPlayerandSetPlayerTurn(this.gameId, userId);
 
         if (numOfPlayers == currentNumberOfPlayers)
         {
@@ -39,10 +40,10 @@ class Game
         }
     }
 
-    timerCheck()////////////////////////////
+    timerCheck()
     {
         const date = new Date();
-        const lastmovetime = 5;//////////////////// get from database;
+        const lastmovetime = dp.getLastMove(this.gameId);
         if (date - lastmovetime >= 20)
         {
             const id = db.getUserIdFromGameId(this.gameId, turn);
@@ -63,18 +64,17 @@ class Game
     throwDice(userid)
     {
         const dicevalue = Math.random() % 6 + 1;
-        // function here to get user position from datbase using userid
         const position = db.getUserPositionByGameId(this.gameId);
         let move = this.board.getMoveAfterThrowingDice(dicevalue, position);
         this.changeTurn();
-        //////////////////// initialize last move date in datbase to move.date
+        db.setLastMove(this.gameId, currentDate);
 
         if (move.to >= 100)
             db.setGameStatus(this.gameId, GameStatus.finished);
         return dicevalue;
     }
 
-    changeTurn()//not completed
+    changeTurn()
     {
         let turn = db.getTurnByGameId(this.gameId);
         const numOfPlayers = db.getNumberOfPlayers(this.gameId);
