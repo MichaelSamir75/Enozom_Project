@@ -2,14 +2,12 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('./utils/database_functions')
+const Game = require('./ActualGame/Game');
 
 const app = express();
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
-
-// In-memory database of users (for demo purposes only)
-const users = [];
 
 // Middleware function to require authentication
 const requireAuth = (req, res, next) => {
@@ -17,7 +15,6 @@ const requireAuth = (req, res, next) => {
 
     if (!token)
         return res.status(401).json({ message: 'Unauthorized' });
-
 
     try {
         const decoded = jwt.verify(token, 'your_secret_key');
@@ -32,6 +29,10 @@ const requireAuth = (req, res, next) => {
         res.status(401).json({ message: 'Unauthorized' });
     }
 };
+
+app.get('/', (req, res) => {
+    return res.send("michaelllllllll");
+})
 
 // Middleware function to require no authentication
 const requireNoAuth = (req, res, next) => {
@@ -91,5 +92,26 @@ app.get('/protected/:userId', requireAuth, (req, res) => {
 app.listen(3000, () => {
     console.log('Server started on port 3000');
 });
+
+app.post('/createGame', requireAuth, (req, res) => {
+    const game = new Game();
+    game.initNewGameObject(req.body.numOfPlayers, req.body.boardnumber)
+});
+
+app.post('/joinGame', requireAuth, (req, res) => {
+    const game = new Game();
+    game.initExistingGameObject(req.body.gameId)
+    game.joinUser(req.body.userId);
+});
+
+app.post('/thowDice', requireAuth, (req, res) => {
+    const game = new Game();
+    game.initExistingGameObject(req.body.gameId);
+    const userId = req.body.userId;
+    if (game.checkCorrectUserTurn(userId) === false)
+        return res.status(401).send("Another User's Turn");
+    game.throwDice(userId);
+});
+
 
 

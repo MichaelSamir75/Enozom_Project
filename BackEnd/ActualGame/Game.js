@@ -7,23 +7,29 @@ class Game
     board
     gameId
 
-    constructor(gameId, numOfPlayers, boardnumber)
+    initNewGameObject(numOfPlayers, boardnumber)
     {
-        ///////////////////////// insert game in database with its game id
-        this.gameId = gameId;
-        // function to get board from database(snakes and stairs)
-        this.playerscounter = 1;
+        const id = db.createGame(gameid, numOfPlayers, boardnumber);
+        this.gameId = id;
         this.board = new Board(boardnumber); ////////////   initialize board frmo databaase
+    }
 
-        db.setGameStatus(this.gameId, GameStatus.waitingForPlayers);
-        /////////// change lastmove time to current date in db
+    initExistingGameObject(id)
+    {
+        this.gameId = gameId;
+        const boardnumber = db.getBoardNumber(this.gameId);
+        this.board = new Board(boardnumber); ////////////   initialize board frmo databaase
+        const status = db.getGameStatus(this.gameId);
+
+        if (status == GameStatus.running)
+            this.timerCheck();
     }
 
     joinUser(userId)
     {
         let currentNumberOfPlayers = db.getCurrentNumberOfPlayers(this.gameId);
         currentNumberOfPlayers++;
-        db.setCurrentNumberOfPlayers(currentNumberOfPlayers);
+        db.setCurrentNumberOfPlayers(this.gameId, currentNumberOfPlayers);
         const numOfPlayers = db.getNumberOfPlayers(this.gameId);
 
         if (numOfPlayers == currentNumberOfPlayers)
@@ -42,10 +48,16 @@ class Game
             const id = db.getUserIdFromGameId(this.gameId, turn);
             this.throwDice(id);
         }
-
         const gamestatus = db.getGameStatus(this.gameId);
         if (gamestatus == GameStatus.finished) return;
         setTimeout(this.timerCheck, 1000);
+    }
+
+    checkCorrectUserTurn(userid)
+    {
+        const correctUserId = db.getUserIdByGameId();
+        if (correctUserId === userid) return true;
+        else return false;
     }
 
     throwDice(userid)
