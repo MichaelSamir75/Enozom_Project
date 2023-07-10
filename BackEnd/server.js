@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const sequelize = new Sequelize(
  'sequalizeDB',
  'root',
-  'Michael82468246',
+  'mysqlpassword123',
   {
     host: 'localhost',
     dialect: 'mysql'

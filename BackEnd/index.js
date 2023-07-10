@@ -16,6 +16,8 @@ app.post('/api/login', (req, res) => {
 
     // TODO: Implement logic to check if username and password are valid
     // For example, you might check them against a database
+    if (!db.checkCredentials(username, password))
+        res.status(403).send("Wrond username or password");
 
     if (username === 'myusername' && password === 'mypassword') {
         // If the username and password are valid, create a JWT token
