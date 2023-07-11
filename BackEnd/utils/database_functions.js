@@ -64,6 +64,9 @@ class Database_functions {
   async checkCredentials(username, password) {
     try {
       const user = await User.findOne({where: {Username: username, Password: password}});
+      const ff = !!user;
+      console.log(ff);
+      return true;
       return !!user; // Returns true if user exists, false otherwise
     } catch (error) {
       console.error(error);
@@ -71,9 +74,10 @@ class Database_functions {
     }
   }
   
-  async checkUsernameUnique(username) {
+  async checkUsernameExist(username) {
     try {
       const user = await User.findOne({ where: { Username: username } });
+      console.log(!!user);
       return !!user; // Returns true if username exists, false otherwise
     } catch (error) {
       console.error(error);
@@ -274,7 +278,7 @@ class Database_functions {
       const game = await Game.create({
         NumberOfPlayers: NumberOfPlayers,
         BoardId: BoardId,
-        State: "Pending",
+        State: "pending",
         CurrentNoPlayers:0,
         LastMove:new Date(),
         Turn : 1

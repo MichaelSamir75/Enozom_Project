@@ -7,30 +7,33 @@ class Game
     board
     gameId
 
-    initNewGameObject(numOfPlayers, boardnumber)
+    async initNewGameObject(numOfPlayers, boardnumber)
     {
-        const id = db.createGame(gameid, numOfPlayers, boardnumber);
+        const id = db.createGame(numOfPlayers, boardnumber);
         this.gameId = id;
-        this.board = new Board(boardnumber);
+        this.board = new Board();
+        return;
+        this.board.initializeBoard(boardnumber);
     }
 
-    initExistingGameObject(id)
+    async initExistingGameObject(gameId)
     {
         this.gameId = gameId;
-        const boardnumber = db.getBoardNumber(this.gameId);
-        this.board = new Board(boardnumber);
-        const status = db.getGameStatus(this.gameId);
+        const boardnumber = await db.getBoardIdByRoomId(this.gameId);
+        this.board = new Board();
+        this.board.initializeBoard(boardnumber);
+        const status = await db.getGameStatus(this.gameId);
 
         if (status == GameStatus.running)
             this.timerCheck();
     }
 
-    joinUser(userId)
+    async joinUser(userId)
     {
-        let currentNumberOfPlayers = db.getCurrentNumberOfPlayers(this.gameId);
+        let currentNumberOfPlayers = await db.getCurrentNumberOfPlayers(this.gameId);
         currentNumberOfPlayers++;
         db.setCurrentNumberOfPlayers(this.gameId, currentNumberOfPlayers);
-        const numOfPlayers = db.getNumberOfPlayers(this.gameId);
+        const numOfPlayers = await db.getNumberOfPlayers(this.gameId);
         db.addPlayerandSetPlayerTurn(this.gameId, userId);
 
         if (numOfPlayers == currentNumberOfPlayers)
@@ -40,32 +43,32 @@ class Game
         }
     }
 
-    timerCheck()
+    async timerCheck()
     {
         const date = new Date();
-        const lastmovetime = dp.getLastMove(this.gameId);
+        const lastmovetime = await dp.getLastMove(this.gameId);
         if (date - lastmovetime >= 20)
         {
-            const id = db.getUserIdFromGameId(this.gameId, turn);
+            const id = await db.getUserIdFromGameId(this.gameId, turn);
             this.throwDice(id);
         }
-        const gamestatus = db.getGameStatus(this.gameId);
+        const gamestatus = await db.getGameStatus(this.gameId);
         if (gamestatus == GameStatus.finished) return;
         setTimeout(this.timerCheck, 1000);
     }
 
-    checkCorrectUserTurn(userid)
+    async checkCorrectUserTurn(userid)
     {
-        const correctUserId = db.getUserIdByGameId();
+        const correctUserId = await db.getUserIdByGameId();
         if (correctUserId === userid) return true;
         else return false;
     }
 
-    throwDice(userid)
+    async throwDice(userid)
     {
         const dicevalue = Math.random() % 6 + 1;
-        const position = db.getUserPositionByGameId(this.gameId);
-        let move = this.board.getMoveAfterThrowingDice(dicevalue, position);
+        const position = await db.getUserPositionByGameId(this.gameId);
+        let move = await this.board.getMoveAfterThrowingDice(dicevalue, position);
         this.changeTurn();
         db.setLastMove(this.gameId, currentDate);
 
@@ -74,12 +77,12 @@ class Game
         return dicevalue;
     }
 
-    changeTurn()
+    async changeTurn()
     {
-        let turn = db.getTurnByGameId(this.gameId);
-        const numOfPlayers = db.getNumberOfPlayers(this.gameId);
+        let turn = await db.getTurnByGameId(this.gameId);
+        const numOfPlayers = await db.getNumberOfPlayers(this.gameId);
         turn = (turn + 1) % numOfPlayers;
-        db.setTurn(this.gameId, turn);
+        db.setGameTurn(this.gameId, turn);
     }
 }
 

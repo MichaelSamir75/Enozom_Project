@@ -1,15 +1,15 @@
 const Move = require('./Move')
-const dp = require('../utils/database_functions')
+const db = require('../utils/database_functions')
 
 class Board
 {
     boardnumber
     transitions
 
-    constructor(boardnumber)
+    async initializeBoard(boardnumber)
     {
         this.boardnumber = boardnumber;
-        const dbTransitions = db.getElementsByBoardId(this.boardnumber);
+        const dbTransitions = await db.getElementsByBoardId(this.boardnumber);
         this.transitions = new Map();
 
         dbTransitions.forEach((jsonObject) => {
@@ -17,7 +17,7 @@ class Board
         });
     }
 
-    getMoveAfterThrowingDice(dicevalue, position)
+    async getMoveAfterThrowingDice(dicevalue, position)
     {
         let newposition = dicevalue + position;
         if (this.transitions.has(newposition))
