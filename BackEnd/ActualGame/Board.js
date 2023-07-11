@@ -13,7 +13,7 @@ class Board
         this.transitions = new Map();
 
         dbTransitions.forEach((jsonObject) => {
-            jsonMap.set(jsonObject.From, jsonObject.To);
+            this.transitions.set(jsonObject.From, jsonObject.To);
         });
     }
 
@@ -22,8 +22,10 @@ class Board
         let newposition = dicevalue + position;
         if (this.transitions.has(newposition))
             newposition = this.transitions.get(newposition);
-        newposition = min(100, newposition);
+        newposition = Math.min(100, newposition);
+
         const move = new Move(position, newposition);
+        return move;
     }
 }
 

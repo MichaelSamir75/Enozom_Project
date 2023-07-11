@@ -15,9 +15,11 @@ app.get('/', (req, res)=> {
 const secret = 'b0283a0483891c85de12320deac3aef036bd83af2580df63dd25a8d0a420004c97cb773935031474de883754161d86f6657bf84c9476d56823e42c9eebe61907'
 
 // Middleware function to require authentication
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////// todo: change username to userid
+///////////////
 const requireAuth = async(req, res, next) => {
     const token = req.headers.authorization;
-
     if (!token)
         return res.status(401).json({ message: 'Unauthorized' });
 
@@ -25,7 +27,7 @@ const requireAuth = async(req, res, next) => {
         const decoded = jwt.verify(token, secret);
 
         // Check if user ID in token matches ID of user in request
-        if (req.params.username && req.params.username !== decoded.username)
+        if (req.params.username && req.params.username != decoded.username)
             return res.status(403).json({ message: 'Forbidden' });
 
         req.user = decoded;
@@ -44,7 +46,7 @@ const requireNoAuth = async(req, res, next) => {
     const token = req.headers.authorization;
     if (token)
         return res.status(403).json({ message: 'Forbidden' });
-
+;
     next();
 };
 
@@ -66,8 +68,6 @@ const requireNoAuth = async(req, res, next) => {
 //     }
 // });
 // by omar taha
-
-
 
 app.post('/register', requireNoAuth, async (req, res) => {
     try {
@@ -113,15 +113,20 @@ app.post('/joinGame', requireAuth, async(req, res) => {
     const game = new Game();
     game.initExistingGameObject(req.body.gameId)
     game.joinUser(req.body.userId);
+    return res.send("successfull");
 });
 
-app.post('/thowDice', requireAuth, async(req, res) => {
+app.post('/throwDice', requireAuth, async(req, res) => {
     const game = new Game();
     game.initExistingGameObject(req.body.gameId);
+
     const userId = req.body.userId;
+
     if ((await game.checkCorrectUserTurn(userId)) === false)
         return res.status(401).send("Another User's Turn");
-    game.throwDice(userId);
+
+    const move = await (game.throwDice(userId));
+    return res.send(move);
 });
 
 

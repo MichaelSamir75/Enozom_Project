@@ -121,6 +121,7 @@ class Database_functions {
       throw error;
     }
   }
+
   async getGameTurn(gameId) {
     try {
       const game = await Game.findByPk(gameId);
@@ -143,7 +144,7 @@ class Database_functions {
       );
 
       if (updatedRows[0] === 0) {
-        throw new Error(`Game not found with ID ${gameId}`);
+        throw new Error(`Game not found with ID ${RoomId}`);
       }
 
       return State;
@@ -177,7 +178,7 @@ class Database_functions {
       if (!player) {
         throw new Error(`Player not found with Game ID ${GameId} and Turn Order ${turnOrder}`);
       }
-
+;
       return player.dataValues.UserId;
     } catch (error) {
       console.error(error);
@@ -217,7 +218,7 @@ class Database_functions {
   async getUserPositionByGameId(gameId) {
     try {
       const turn = await this.getGameTurn(gameId);
-      const position = await this.getPositionByTurnOrderAndGameId(gameId, turn);
+      const position = await this.getPositionByTurnOrderAndGameId(turn, gameId);
       return position;
     } catch (error) {
       console.error(error);
@@ -237,6 +238,26 @@ class Database_functions {
       await game.save();
 
       return lastMove;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async setPlayerPosition(gameId,userId, Position) { ////////////////
+    try {
+      const player = await Player.findOne({
+        where: { UserId: userId, GameId: gameId },
+        // attributes: ['Position']
+      });
+      if (!player) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+
+      player.Position = Position;
+      await player.save();
+
+      return Position;
     } catch (error) {
       console.error(error);
       throw error;
@@ -308,7 +329,6 @@ class Database_functions {
   async addPlayerandSetPlayerTurn(GameId, UserId) {
     try {
       const currentNoPlayers = await this.getCurrentNumberOfPlayers(GameId);
-  
       const player = await Player.create({
         GameId: GameId,
         UserId: UserId,
@@ -322,7 +342,25 @@ class Database_functions {
       throw error;
     }
   }
-  
+
+
+  async setCurrentNumberOfPlayers(RoomId, CurrentNumOfPlayers) { // michaellllllllllllll
+    try {
+      const updatedRows = await Game.update(
+          {CurrentNoPlayers: CurrentNumOfPlayers},
+          {where: {RoomId: RoomId}}
+      );
+
+      if (updatedRows[0] === 0) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+
+      return CurrentNumOfPlayers;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
 }
 
