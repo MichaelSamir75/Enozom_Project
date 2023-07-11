@@ -1,0 +1,10 @@
+.App {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: url("https://media.istockphoto.com/id/1075478326/photo/vintage-antique-snakes-and-ladders-board-game.jpg?s=612x612&w=0&k=20&c=5Ehqo4DGY_iYyMbjlWGchHODBC-lvwRzwh7RBBsywys=");
+}
