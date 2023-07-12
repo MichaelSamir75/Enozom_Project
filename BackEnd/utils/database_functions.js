@@ -7,6 +7,19 @@ const {Board} = require('../models');
 const {Elements} = require('../models');
 
 class Database_functions {
+  async getIdByUsername(username) {
+    try {
+      const user = await User.findOne({ where: { Username: username } });
+      if (!user) {
+        throw new Error(`User not found with username ${username}`);
+      }
+      return user.dataValues.UserId;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  
 
   async getUsernameById(userId) {
     try {
@@ -364,7 +377,110 @@ class Database_functions {
       throw error;
     }
   }
+  async getPendingGameIdsByUserId(userId) {
+    try {
+      const games = await Game.findAll({
+        include: [
+          {
+            model: Player,
+            where: { UserId : userId },
+          },
+        ],
+        where: { State: 'Pending' },
+        attributes: ['RoomId'],
+      });
+  
+      return games.map(game => game.gameId);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
+  async getUserGames(UserId) {
+    try {
+      const games = await Game.findAll({
+        include: {
+          model: Player,
+          where: { UserId },
+          required : false
+        },
+        where: { State: state },
+      });
+  
+      return games.map(game => game.get({ plain: true }));
+      } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  async getGameIdsByUserId(userId) {
+    try {
+      const playerGames = await Player.findAll({
+        where: { UserId: userId },
+        attributes: ['GameId'],
+        raw: true,
+      });
+  
+      const gameIds = playerGames.map(playerGame => playerGame.GameId);
+      return gameIds;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async getGameById(gameId) {
+    try {
+      const game = await Game.findByPk(gameId);
+      if (!game) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+      return game.dataValues;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  async getAllUserIdsByGameId(gameId) {
+    try {
+      const players = await Player.findAll({
+        where: { GameId: gameId },
+        attributes: ['UserId']
+      });
+  
+      const userIds = players.map(player => player.UserId);
+      return userIds;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  async getUserById(userId) {
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) {
+        throw new Error(`User not found with ID ${userId}`);
+      }
+      return user.dataValues;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async getBoardById(boardId) {
+    try {
+      const board = await Board.findByPk(boardId);
+      if (!board) {
+        throw new Error(`Board not found with ID ${boardId}`);
+      }
+      return board.dataValues;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 
@@ -376,6 +492,11 @@ const dbFunctions = new Database_functions();
 // const userId = 1;
 // const gameId = 1;
 
+const userId = 1; // Replace with your actual user ID
+dbFunctions.getGameById(1)
+.then(ids => {
+    console.log(ids)
+});
 
 // dbFunctions.getElementsByBoardId(1)
 //   .then(elements => {

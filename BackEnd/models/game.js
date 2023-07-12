@@ -6,8 +6,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // Define associations here
       Game.belongsTo(models.Board, { foreignKey: 'BoardId' });
+      Game.hasMany(models.Player, { foreignKey: 'GameId' });
+
     }
   }
+
   Game.init({
     RoomId: {
       type: DataTypes.INTEGER,
