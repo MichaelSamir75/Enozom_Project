@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    Colour:{
+      type:DataTypes.STRING,
+      allowNull: false,
+    }
     // GameId: {
     //   primaryKey: true,
     //   type: DataTypes.INTEGER

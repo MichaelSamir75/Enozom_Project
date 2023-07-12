@@ -7,12 +7,14 @@ module.exports = {
       GameId: 1,
       UserId: 1,
       Position: 1,
-      TurnOrder: 1
+      TurnOrder: 1,
+      Colour: "Red"
     },{
       GameId: 1,
       UserId: 2,
       Position: 1,
-      TurnOrder: 1
+      TurnOrder: 1,
+      Colour: "Blue"
     }], {});
   },
 
