@@ -2,8 +2,11 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const db = require('./utils/database_functions')
 const Game = require('./ActualGame/Game');
+const cors = require('cors');
+
 
 const app = express();
+app.use(cors({ origin: 'http://localhost:3001' }));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -91,6 +94,7 @@ app.post('/register', requireNoAuth, async (req, res) => {
 
 // Login as an existing user
 app.post('/login', requireNoAuth, async(req, res) => {
+    console.log(11111111111111111111)
     const username = req.body.username;
     const password = req.body.password;
 

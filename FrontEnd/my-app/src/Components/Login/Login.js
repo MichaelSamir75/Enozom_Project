@@ -1,70 +1,72 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import basestyle from "../Base.module.css";
 import loginstyle from "./Login.module.css";
 import axios from "axios";
 import { useNavigate, NavLink } from "react-router-dom";
+
 const Login = ({ setUserState }) => {
   const navigate = useNavigate();
   const [formErrors, setFormErrors] = useState({});
-  const [isSubmit, setIsSubmit] = useState(false);
   const [user, setUserDetails] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
   const changeHandler = (e) => {
     const { name, value } = e.target;
-    setUserDetails({
-      ...user,
+    setUserDetails((prevState) => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
   };
-  const validateForm = (values) => {
-    const error = {};
-    const regex = /^[^\s+@]+@[^\s@]+\.[^\s@]{2,}$/i;
-    if (!values.email) {
-      error.email = "Email is required";
-    } else if (!regex.test(values.email)) {
-      error.email = "Please enter a valid email address";
+
+  const validateForm = () => {
+    const errors = {};
+
+    if (!user.username) {
+      errors.username = "username is required";
     }
-    if (!values.password) {
-      error.password = "Password is required";
+
+    if (!user.password) {
+      errors.password = "Password is required";
     }
-    return error;
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0; // Returns true if there are no errors
   };
 
   const loginHandler = (e) => {
     e.preventDefault();
-    setFormErrors(validateForm(user));
-    setIsSubmit(true);
-    // if (!formErrors) {
 
-    // }
+    if (validateForm()) {
+      console.log(user)
+      axios
+        .post("http://localhost:3000/login", user)
+        .then((res) => {
+          console.log(res.data.token);
+          setUserState(res.data.user);
+          navigate("/", { replace: true });
+        })
+        .catch((error) => {
+          console.log("Error:", error);
+        });
+    }
   };
 
-  useEffect(() => {
-    if (Object.keys(formErrors).length === 0 && isSubmit) {
-      console.log(user);
-      axios.post("http://localhost:9002/login", user).then((res) => {
-        alert(res.data.message);
-        setUserState(res.data.user);
-        navigate("/", { replace: true });
-      });
-    }
-  }, [formErrors]);
   return (
     <div className={loginstyle.login}>
       <form>
         <h1>Login</h1>
         <input
-          type="email"
-          name="email"
-          id="email"
-          placeholder="Email"
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Username"
           onChange={changeHandler}
-          value={user.email}
+          value={user.username}
         />
-        <p className={basestyle.error}>{formErrors.email}</p>
+        {formErrors.username && <p className={basestyle.error}>{formErrors.username}</p>}
+
         <input
           type="password"
           name="password"
@@ -73,7 +75,8 @@ const Login = ({ setUserState }) => {
           onChange={changeHandler}
           value={user.password}
         />
-        <p className={basestyle.error}>{formErrors.password}</p>
+        {formErrors.password && <p className={basestyle.error}>{formErrors.password}</p>}
+
         <button className={basestyle.button_common} onClick={loginHandler}>
           Login
         </button>
@@ -82,4 +85,5 @@ const Login = ({ setUserState }) => {
     </div>
   );
 };
+
 export default Login;
