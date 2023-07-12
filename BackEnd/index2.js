@@ -75,7 +75,7 @@ app.post('/register', requireNoAuth, async (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
         const userexist = await db.checkUsernameExist(username);
-
+        
         if (userexist) {
             return res.status(409).json({message: 'Username already taken'});
         } else {

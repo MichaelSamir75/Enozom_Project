@@ -1,8 +1,10 @@
-const User = require('../models/user.module');
-const Game = require('../models/game.module');
-const Player = require('../models/player.module');
-const Board = require('../models/board.module');
-const Elements = require('../models/elements.module');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op
+const {User} = require('../models');
+const {Game} = require('../models');
+const {Player} = require('../models');
+const {Board} = require('../models');
+const {Elements} = require('../models');
 
 class Database_functions {
 
@@ -62,6 +64,7 @@ class Database_functions {
 
 // function for login
   async checkCredentials(username, password) {
+    console.log(username);
     try {
       const user = await User.findOne({where: {Username: username, Password: password}});
       const ff = !!user;
