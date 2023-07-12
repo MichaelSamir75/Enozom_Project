@@ -119,6 +119,23 @@ class Database_functions {
       throw error;
     }
   }
+  async getColor(userId, gameId) {
+    try {
+      const player = await Player.findOne({
+        where: {GameId: gameId, UserId: userId},
+        attributes: ['Colour']
+      });
+
+      if (!player) {
+        throw new Error(`Player not found with Game ID ${gameId} and User ID ${userId}`);
+      }
+
+      return player.dataValues.Colour;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
   async setGameTurn(RoomId, Turn) {
     try {
@@ -260,11 +277,10 @@ class Database_functions {
     }
   }
 
-  async setPlayerPosition(gameId,userId, Position) { ////////////////
+  async setPlayerPosition(gameId,userId, Position) { 
     try {
       const player = await Player.findOne({
         where: { UserId: userId, GameId: gameId },
-        // attributes: ['Position']
       });
       if (!player) {
         throw new Error(`Game not found with ID ${gameId}`);
@@ -280,6 +296,24 @@ class Database_functions {
     }
   }
 
+  async setColor(gameId,userId, color) { 
+    try {
+      const player = await Player.findOne({
+        where: { UserId: userId, GameId: gameId },
+      });
+      if (!player) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+
+      player.Colour = color;
+      await player.save();
+
+      return color;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
   async getLastMove(RoomId) {
     try {
       const game = await Game.findByPk(RoomId);
@@ -493,7 +527,7 @@ const dbFunctions = new Database_functions();
 // const gameId = 1;
 
 const userId = 1; // Replace with your actual user ID
-dbFunctions.getGameById(1)
+dbFunctions.setColor(1,1,"Black")
 .then(ids => {
     console.log(ids)
 });
