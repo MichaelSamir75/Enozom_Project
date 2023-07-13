@@ -382,7 +382,7 @@ class Database_functions {
       const player = await Player.create({
         GameId: GameId,
         UserId: UserId,
-        Position: 0,
+        Position: 1,
         TurnOrder: currentNoPlayers+1
       });
   
@@ -515,6 +515,45 @@ class Database_functions {
       throw error;
     }
   }
+
+  async getAllUserPendingAndRunningGames(userId)
+  {
+    const ans = [];
+    const gameIds = await db.getUserGameIds(UserId);
+    gameIds.forEach((gameid) => {
+      const game = db.getGameById(gameid);
+      if (game.GameStatus === "running" || game.GameStatus === "pending")
+        ans.push(gameid)
+    })
+    return ans;
+  }
+
+  async getUserRouteAndJson(username)
+  {
+    const userid = await db.getIdByUsername(username);
+    const gamedIds = await db.getAllUserPendingAndRunningGames(userid);
+
+    const myjson = {};
+
+    if (gamedIds.length == 0) // send user to choose game
+    {
+      myjson.InGameStatus = "Not In Game";
+      myjson
+    }
+    else // send user to the actual game
+    {
+      const mygameId = gameIds[0];
+      const game = new Game();
+      game.initExistingGameObject(mygameId);
+
+      myjson.InGameStatus = "In Game";
+      myjson.GameJson = await game.getGameJson();
+    }
+    return myjson;
+  }
+
+
+
 }
 
 
