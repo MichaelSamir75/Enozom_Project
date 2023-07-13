@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
    // informs a new player who has just joined the game about the players who have already joined the game
 
   socket.on("joined", () => {
-    socket.to(data.id).emit("joined", users);
+    socket.emit("joined", users);
   });
 
   socket.on("throwDice", (data) => {
