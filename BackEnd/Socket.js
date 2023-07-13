@@ -24,13 +24,13 @@ io.on("connection", (socket) => {
 
   socket.on("join", (data) => {
     users.join(data);
-    io.sockets.emit(`player with ID: ${users.id} joined: ${data}`);
+    io.sockets.emit("join", data);
   });
 
    // informs a new player who has just joined the game about the players who have already joined the game
 
-  socket.on("joined", (data) => {
-    socket.to(data.id).emit("joined", data);
+  socket.on("joined", () => {
+    socket.to(data.id).emit("joined", users);
   });
 
   socket.on("throwDice", (data) => {
