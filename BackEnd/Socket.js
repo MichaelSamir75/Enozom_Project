@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("throwDice", (data) => {
-    users[data.id].Position = data.pos;
+    users[data.id].Position = data.Position;
     const turn = data.num != 6 ? (data.id + 1) % users.length : data.id;
     io.sockets.emit("throwDice", data, turn);
   });
