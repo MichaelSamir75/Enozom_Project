@@ -1,12 +1,13 @@
 .button_common {
     background-color: rgb(145, 90, 23);
     color: white;
-    padding: 15px 30px;
+    padding: 8px 15px;
     border: none;
     font-size: 22px;
     border-radius: 15px;
     margin: 1rem;
-    width: 90%;
+    justify-self: center;
+    cursor: pointer;
 }
 .error {
     color: red;
@@ -14,4 +15,21 @@
     margin: auto;
     font-size: 16px;
     padding: 0px 1rem;
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+
+}
+.first, .second{
+    background-color: white;
+    width: 400px;
+    border-radius: 6px;
+    text-align: center;
+    padding: 4px;
+
 }

@@ -90,6 +90,40 @@ class Game
         turn++;
         db.setGameTurn(this.gameId, turn);
     }
+
+    async getGameJson()
+    {
+        const gamejson = db.getGameById(this.gameId);
+        const usersMap = this.getUsersJsonInGameJson();
+        const board = await db.getBoardById(gamejson.BoardId);
+        let finaljson = {status: gamejson.status,
+            numOfPlayers: gamejson.numOfPlayers,
+            currentnumOfPlayers: gamejson.currentnumOfPlayers,
+            usersMap: usersMap,
+            imagePath: board.PathToBoard};
+        finaljson.gamestatus = await db.getGameStatus(this.gameId)
+    }
+    async ff()
+    {
+
+    }
+    async getUsersJsonInGameJson()
+    {
+        const usersIds = db.getAllUserIdsByGameId(this.gameId);
+        const playingUserId = db.getUserIdByGameId(this.gameId);
+        const map = new Map;
+        usersIds.forEach (async (id) => {
+            const userData = db.getUserById(id)
+            const json = {};
+            if (id == playingUserId)
+                json.userPlayingStatus = true;
+            else
+                json.userPlayingStatus = false;
+            json.position = await db.getPosition(id, this.gameId);
+            json.color = await db.getColor(id, this.gameId);
+            map.set(id, json);
+        })
+    }
 }
 
 const GameStatus = {

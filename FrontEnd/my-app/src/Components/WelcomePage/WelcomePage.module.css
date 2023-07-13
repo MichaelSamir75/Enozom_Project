@@ -1,0 +1,32 @@
+.welcome-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f2f2f2;
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 3rem;
+}
+
+button {
+    font-size: 2rem;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    margin: 1rem;
+    cursor: pointer;
+}
+
+.new-game-button {
+    background-color: #00cc99;
+    color: white;
+}
+
+.join-game-button {
+    background-color: #ff9900;
+    color: white;
+}

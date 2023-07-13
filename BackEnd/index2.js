@@ -6,7 +6,7 @@ const cors = require('cors');
 
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3001' }));
+app.use(cors({ origin: '*' }));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -24,7 +24,7 @@ const secret = 'b0283a0483891c85de12320deac3aef036bd83af2580df63dd25a8d0a420004c
 const requireAuth = async(req, res, next) => {
     const token = req.headers.authorization;
     if (!token)
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ message: 'Unauthorized' , nextPage: 'login'});
 
     try {
         const decoded = jwt.verify(token, secret);
@@ -94,7 +94,6 @@ app.post('/register', requireNoAuth, async (req, res) => {
 
 // Login as an existing user
 app.post('/login', requireNoAuth, async(req, res) => {
-    console.log(11111111111111111111)
     const username = req.body.username;
     const password = req.body.password;
 
@@ -102,9 +101,12 @@ app.post('/login', requireNoAuth, async(req, res) => {
     if (!(await db.checkCredentials(username, password)))
         return res.status(401).json({ message: 'Invalid username or password' });
 
+    const myjson = await db.getUserRouteAndJson(username);
+    myjson.status = 'successful'
     // Generate JWT and send to client
     const token = jwt.sign({ username: username }, secret);
-    res.json({ token });
+    myjson.token = token;
+    res.json({ myjson });
 });
 
 app.post('/createGame', requireAuth, async(req, res) => {
@@ -132,7 +134,6 @@ app.post('/throwDice', requireAuth, async(req, res) => {
     const move = await (game.throwDice(userId));
     return res.send(move);
 });
-
 
 app.listen(3000, () => {
     console.log('Server started on port 3000');
