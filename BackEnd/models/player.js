@@ -4,7 +4,6 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Player extends Model {
     static associate(models) {
-      // Define associations here
       Player.belongsTo(models.Game, { foreignKey: 'GameId' });
       Player.belongsTo(models.User, { foreignKey: 'UserId' });
     }
@@ -36,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    Colour:{
+      type:DataTypes.STRING,
+      allowNull: false,
+    }
     // GameId: {
     //   primaryKey: true,
     //   type: DataTypes.INTEGER

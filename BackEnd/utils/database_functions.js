@@ -5,9 +5,21 @@ const {Game} = require('../models');
 const {Player} = require('../models');
 const {Board} = require('../models');
 const {Elements} = require('../models');
-const jwt = require("jsonwebtoken");
 
 class Database_functions {
+  async getIdByUsername(username) {
+    try {
+      const user = await User.findOne({ where: { Username: username } });
+      if (!user) {
+        throw new Error(`User not found with username ${username}`);
+      }
+      return user.dataValues.UserId;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  
 
   async getUsernameById(userId) {
     try {
@@ -102,6 +114,23 @@ class Database_functions {
       }
 
       return player.dataValues.Position;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  async getColor(userId, gameId) {
+    try {
+      const player = await Player.findOne({
+        where: {GameId: gameId, UserId: userId},
+        attributes: ['Colour']
+      });
+
+      if (!player) {
+        throw new Error(`Player not found with Game ID ${gameId} and User ID ${userId}`);
+      }
+
+      return player.dataValues.Colour;
     } catch (error) {
       console.error(error);
       throw error;
@@ -248,11 +277,10 @@ class Database_functions {
     }
   }
 
-  async setPlayerPosition(gameId,userId, Position) { ////////////////
+  async setPlayerPosition(gameId,userId, Position) { 
     try {
       const player = await Player.findOne({
         where: { UserId: userId, GameId: gameId },
-        // attributes: ['Position']
       });
       if (!player) {
         throw new Error(`Game not found with ID ${gameId}`);
@@ -268,6 +296,24 @@ class Database_functions {
     }
   }
 
+  async setColor(gameId,userId, color) { 
+    try {
+      const player = await Player.findOne({
+        where: { UserId: userId, GameId: gameId },
+      });
+      if (!player) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+
+      player.Colour = color;
+      await player.save();
+
+      return color;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
   async getLastMove(RoomId) {
     try {
       const game = await Game.findByPk(RoomId);
@@ -336,7 +382,7 @@ class Database_functions {
       const player = await Player.create({
         GameId: GameId,
         UserId: UserId,
-        Position: 1,
+        Position: 0,
         TurnOrder: currentNoPlayers+1
       });
   
@@ -365,41 +411,109 @@ class Database_functions {
       throw error;
     }
   }
-
-  async getAllUserPendingAndRunningGames(userId)
-  {
-    const ans = [];
-    const gameIds = await db.getUserGameIds(UserId);
-    gameIds.forEach((gameid) => {
-      const game = db.getGameById(gameid);
-      if (game.GameStatus === "running" || game.GameStatus === "pending")
-        ans.push(gameid)
-    })
-    return ans;
+  async getPendingGameIdsByUserId(userId) {
+    try {
+      const games = await Game.findAll({
+        include: [
+          {
+            model: Player,
+            where: { UserId : userId },
+          },
+        ],
+        where: { State: 'Pending' },
+        attributes: ['RoomId'],
+      });
+  
+      return games.map(game => game.gameId);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
-  async getUserRouteAndJson(username)
-  {
-    const userid = await db.getIdByUsername(username);
-    const gamedIds = await db.getAllUserPendingAndRunningGames(userid);
-
-    const myjson = {};
-
-    if (gamedIds.length == 0) // send user to choose game
-    {
-      myjson.InGameStatus = "Not In Game";
-      myjson
+  async getUserGames(UserId) {
+    try {
+      const games = await Game.findAll({
+        include: {
+          model: Player,
+          where: { UserId },
+          required : false
+        },
+        where: { State: state },
+      });
+  
+      return games.map(game => game.get({ plain: true }));
+      } catch (error) {
+      console.error(error);
+      throw error;
     }
-    else // send user to the actual game
-    {
-      const mygameId = gameIds[0];
-      const game = new Game();
-      game.initExistingGameObject(mygameId);
-
-      myjson.InGameStatus = "In Game";
-      myjson.GameJson = await game.getGameJson();
+  }
+  async getGameIdsByUserId(userId) {
+    try {
+      const playerGames = await Player.findAll({
+        where: { UserId: userId },
+        attributes: ['GameId'],
+        raw: true,
+      });
+  
+      const gameIds = playerGames.map(playerGame => playerGame.GameId);
+      return gameIds;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    return myjson;
+  }
+
+  async getGameById(gameId) {
+    try {
+      const game = await Game.findByPk(gameId);
+      if (!game) {
+        throw new Error(`Game not found with ID ${gameId}`);
+      }
+      return game.dataValues;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  async getAllUserIdsByGameId(gameId) {
+    try {
+      const players = await Player.findAll({
+        where: { GameId: gameId },
+        attributes: ['UserId']
+      });
+  
+      const userIds = players.map(player => player.UserId);
+      return userIds;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  async getUserById(userId) {
+    try {
+      const user = await User.findByPk(userId);
+      if (!user) {
+        throw new Error(`User not found with ID ${userId}`);
+      }
+      return user.dataValues;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async getBoardById(boardId) {
+    try {
+      const board = await Board.findByPk(boardId);
+      if (!board) {
+        throw new Error(`Board not found with ID ${boardId}`);
+      }
+      return board.dataValues;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }
 
@@ -412,6 +526,11 @@ const dbFunctions = new Database_functions();
 // const userId = 1;
 // const gameId = 1;
 
+const userId = 1; // Replace with your actual user ID
+dbFunctions.setColor(1,1,"Black")
+.then(ids => {
+    console.log(ids)
+});
 
 // dbFunctions.getElementsByBoardId(1)
 //   .then(elements => {
